@@ -1,0 +1,32 @@
+//@version=4
+strategy("S EMA Cross L EMA Strategy (Long Only)", shorttitle="EMA Crossover", overlay=true)
+
+// Define the EMA lengths
+ema_small_length = 9
+ema_larg_length = 13
+
+// Calculate the EMAs
+ema_small = ema(close, ema_small_length)
+ema_larg = ema(close, ema_larg_length)
+
+// Plot the EMAs on the chart
+plot(ema_small, color=color.blue, title="Small EMA")
+plot(ema_larg, color=color.red, title="Larg EMA")
+
+// Define the conditions for buying (long) and selling
+buy_condition = crossover(ema_small, ema_larg)
+sell_condition = crossunder(ema_small, ema_larg)  // New sell condition
+
+// Plot buy and sell signals on the chart
+plotshape(series=buy_condition, title="Buy Signal", location=location.belowbar, color=color.green, style=shape.triangleup, size=size.small)
+plotshape(series=sell_condition, title="Sell Signal", location=location.abovebar, color=color.red, style=shape.triangledown, size=size.small)
+
+// Define the stop loss value
+sl_value = 10
+stop_loss_value = sl_value  // 0.10 or 10 ticks
+
+// Strategy orders for long positions only
+strategy.entry("Buy", strategy.long, when=buy_condition)
+
+// Exit position when EMA 9 crosses under EMA 13 and apply stop loss
+strategy.exit("Exit", from_entry="Buy", when=sell_condition, stop=stop_loss_value)  // Exit with regular stop loss
